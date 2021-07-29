@@ -2,8 +2,6 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 import psycopg2
-import json
-
 
 #https://www.postgresqltutorial.com/postgresql-python/connect/
 
