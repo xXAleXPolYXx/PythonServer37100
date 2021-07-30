@@ -8,7 +8,7 @@ import psycopg2
 app = Flask(__name__)
 CORS(app)
 
-url="192.168.20.20"
+url="127.0.0.1"
 db="geoapp"
 us="postgres"
 psw="postgres"
@@ -139,4 +139,4 @@ def post():
 
 ###################################################
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port='7484', debug=True)
