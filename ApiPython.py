@@ -2,13 +2,14 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 import psycopg2
+import json
 
 #https://www.postgresqltutorial.com/postgresql-python/connect/
 
 app = Flask(__name__)
 CORS(app)
 
-url="127.0.0.1"
+url="3.142.202.105"
 db="geoapp"
 us="postgres"
 psw="postgres"
@@ -56,7 +57,7 @@ def getParcheggiDedicati():
 def getParchiPoligoni():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.parchipoligoni LIMIT 50) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.parchipoligoni) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -76,12 +77,20 @@ def getPopolazioneResidente():
     righe = cur.fetchone()
     return righe[0]
 
+@app.route("/get/popolazioneResidentePerCircoscrizione", methods=['GET'])
+def getPopolazioneResidentePerCircoscrizione():
+    conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
+    cur = conn.cursor()
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         inputs.gid,    'geometry',   ST_AsGeoJSON(inputs.geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom' ) AS feature  FROM (SELECT circ.*, sum(pop.residenti) as residenti FROM circoscrizioni as circ  INNER JOIN public.popolazioneresidente AS pop ON ST_Contains(circ.geom,pop.geom) GROUP BY circ.gid) inputs) features;")
+    righe = cur.fetchone()
+    return righe[0]
+
 #NOT WORKING per Coordinate
 @app.route("/get/puntiDiInteresse", methods=['GET'])
 def getPuntiDiInteresse():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.puntidiinteresse LIMIT 1) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.tabellainter) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
