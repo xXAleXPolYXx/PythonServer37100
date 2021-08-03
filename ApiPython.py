@@ -9,7 +9,7 @@ import json
 app = Flask(__name__)
 CORS(app)
 
-url="3.142.202.105"
+url="192.168.20.20"
 db="geoapp"
 us="postgres"
 psw="postgres"
@@ -19,6 +19,14 @@ psw="postgres"
 @app.route("/")
 def hello():
     return "I am running!!!"
+
+@app.route("/get/centroAbitato", methods=['GET'])
+def getCentroAbitato():
+    conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
+    cur = conn.cursor()
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.centro_abitato) inputs) features;")
+    righe = cur.fetchone()
+    return righe[0]
 
 @app.route("/get/circoscrizioni", methods=['GET'])
 def getCircoscrizioni():
@@ -40,7 +48,7 @@ def getFarmacie():
 def getNuoveZone30():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.nuovazona30) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.nuova_zona_30) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -48,7 +56,7 @@ def getNuoveZone30():
 def getParcheggiDedicati():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.parcheggi) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.parcheggi_dedicati) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -57,7 +65,7 @@ def getParcheggiDedicati():
 def getParchiPoligoni():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.parchipoligoni) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.parchi_poligoni) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -65,7 +73,7 @@ def getParchiPoligoni():
 def getParchiPunti():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.parchipunti) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.parchi_punti) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -73,7 +81,7 @@ def getParchiPunti():
 def getPopolazioneResidente():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.popolazioneresidente LIMIT 50) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.popolazione_residente) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -81,7 +89,7 @@ def getPopolazioneResidente():
 def getPopolazioneResidentePerCircoscrizione():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         inputs.gid,    'geometry',   ST_AsGeoJSON(inputs.geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom' ) AS feature  FROM (SELECT circ.*, sum(pop.residenti) as residenti FROM circoscrizioni as circ  INNER JOIN public.popolazioneresidente AS pop ON ST_Contains(circ.geom,pop.geom) GROUP BY circ.gid) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         inputs.gid,    'geometry',   ST_AsGeoJSON(inputs.geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom' ) AS feature  FROM (SELECT circ.*, sum(pop.residenti) as residenti FROM circoscrizioni as circ  INNER JOIN public.popolazione_residente AS pop ON ST_Contains(circ.geom,pop.geom) GROUP BY circ.gid) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -90,7 +98,7 @@ def getPopolazioneResidentePerCircoscrizione():
 def getPuntiDiInteresse():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.tabellainter) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.punti_di_interesse_geom) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -114,7 +122,7 @@ def getScuole():
 def getSostaVietata():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.sostavietata) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.sosta_vietata) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -122,7 +130,7 @@ def getSostaVietata():
 def getStrade30():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.strade30) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.strade_30) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
@@ -130,7 +138,7 @@ def getStrade30():
 def getZone30():
     conn = psycopg2.connect(host=url, database=db, user=us, password=psw)
     cur = conn.cursor()
-    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.zone30) inputs) features;")
+    cur.execute("SELECT jsonb_build_object(    'type',     'FeatureCollection',    'features', jsonb_agg(features.feature))FROM (  SELECT jsonb_build_object(    'type',       'Feature',    'id',         gid,    'geometry',   ST_AsGeoJSON(geom)::jsonb,    'properties', to_jsonb(inputs) - 'gid' - 'geom'  ) AS feature  FROM (SELECT * FROM public.zone_30) inputs) features;")
     righe = cur.fetchone()
     return righe[0]
 
